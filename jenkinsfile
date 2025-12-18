@@ -2,7 +2,6 @@ pipeline {
      agent {
           dockerContainer {
                image 'python-build-image'  // tu imagen con Python
-               args '-u root:root'         // opcional, si necesitas permisos
           }
      }
      environment { VENV_DIR = "venv" }
