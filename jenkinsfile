@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'PythonNode' } // o docker
+    agent { docker { image 'python-build-image' } }
     environment { VENV_DIR = "venv" }
     stages {
         stage('Info Inicial') { steps { echo "Pipeline iniciado" } }
