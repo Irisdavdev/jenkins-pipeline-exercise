@@ -14,7 +14,7 @@ pipeline {
             }
         }
 
-        stage('Crear entorno virtual') {
+        stage('check') {
             steps {
                 sh 'python3 --version'
             }
