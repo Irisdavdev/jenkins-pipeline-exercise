@@ -1,0 +1,45 @@
+pipeline {
+    agent any
+    environment {
+        VENV_DIR = "venv"
+    }
+    stages {
+        stage('Info Inicial de pipeline') {
+            steps {
+                script {
+                    echo "Pipeline de cicloturismo iniciado"
+                    echo "USER_PARAM: ${params.USER_PARAM ?: 'no definido'}"
+                }
+            }
+        }
+
+        stage('Crear entorno virtual') {
+            steps {
+                sh 'python3 -m venv venv'
+            }
+        }
+
+        stage('Instalar dependencias') {
+            steps {
+                sh '''
+                source venv/bin/activate
+                pip install --upgrade pip
+                pip install -r requirements.txt
+                '''
+            }
+        }
+
+        stage('Ejecutar script Python') {
+            steps {
+                sh '''
+                source venv/bin/activate
+                python script.py
+                '''
+            }
+        }
+    }
+    post {
+        success { echo "Pipeline completado correctamente" }
+        failure { echo "Pipeline falló, revisar logs" }
+    }
+}
