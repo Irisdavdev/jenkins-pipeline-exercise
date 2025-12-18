@@ -15,7 +15,7 @@ pipeline {
 
         stage('Crear entorno virtual') {
             steps {
-                sh 'python -m venv venv'
+                sh 'python3 --version'
             }
         }
 
