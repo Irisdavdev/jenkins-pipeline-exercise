@@ -20,20 +20,9 @@ pipeline {
             }
         }
 
-        stage('Instalar dependencias') {
-            steps {
-                sh '''
-                source venv/bin/activate
-                pip install --upgrade pip
-                pip install -r requirements.txt
-                '''
-            }
-        }
-
         stage('Ejecutar script Python') {
             steps {
                 sh '''
-                source venv/bin/activate
                 python script.py
                 '''
             }
