@@ -27,7 +27,8 @@ pipeline {
         stage('2. Crear entorno virtual') {
             steps {
                 // Punto 2: Crear venv
-                sh 'python3 -m venv venv'
+                sh '/usr/bin/python3 -m venv venv'
+                echo "Entorno virtual creado por ruta absoluta"
             }
         }
 
@@ -36,6 +37,7 @@ pipeline {
                 // Punto 3: Instalar dependencias
                 sh './venv/bin/pip install --upgrade pip'
                 sh './venv/bin/pip install -r requirements.txt'
+                echo "Dependencias instaladas"
             }
         }
 
