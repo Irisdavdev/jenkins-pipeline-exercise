@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+
+    agent {
+        docker { 
+            image 'python:3.9-slim' 
+        }
+    }
 
     parameters {
         string(name: 'USUARIO_NOMBRE', defaultValue: 'Estudiante', description: 'Introduce tu nombre')
@@ -26,9 +31,9 @@ pipeline {
 
         stage('2. Crear entorno virtual') {
             steps {
-                // Punto 2: Crear venv
-                sh '/usr/bin/python3 -m venv venv'
-                echo "Entorno virtual creado por ruta absoluta"
+                // Ahora usamos el comando simple porque la imagen ya lo trae
+                sh 'python -m venv venv'
+                echo "Entorno virtual creado dentro del contenedor"
             }
         }
 
