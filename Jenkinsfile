@@ -1,6 +1,6 @@
 pipeline {
-    // Usamos un contenedor de Python para que no dependa de lo que hay instalado en el servidor
     agent {
+        // Ahora que tienes el plugin, esta sintaxis funcionará perfectamente
         docker { 
             image 'python:3.9-slim' 
         }
@@ -8,35 +8,33 @@ pipeline {
 
     parameters {
         string(name: 'USUARIO_NOMBRE', defaultValue: 'Estudiante', description: 'Introduce tu nombre')
-        // Punto 7: Parámetro de archivo para el SQL
-        file(name: 'setup.sql', description: 'Sube tu archivo setup.sql')
+        file(name: 'setup.sql', description: 'Archivo SQL para la base de datos')
     }
 
     stages {
         stage('1. Preparar Archivos') {
             steps {
                 script {
-                    // Jenkins guarda los archivos subidos en una ruta temporal. 
-                    // Debemos moverlo al workspace para que el script de Python lo vea.
+                    // Localizamos el archivo SQL subido y lo movemos al directorio de trabajo
+                    // El comando 'find' ayuda a encontrarlo sin importar la carpeta temporal
                     sh "mv \$(find . -name setup.sql) ./setup.sql"
-                    echo "✅ Archivo SQL preparado en el workspace"
+                    echo "✅ Archivo setup.sql listo para el script."
                 }
             }
         }
 
         stage('2. Instalar Dependencias') {
             steps {
-                // En un contenedor Docker de Python, no solemos necesitar venv,
-                // podemos instalar directamente en el sistema del contenedor.
+                // Dentro del contenedor de Python no necesitas crear un 'venv'
                 sh 'pip install --upgrade pip'
                 sh 'pip install -r requirements.txt'
             }
         }
 
-        stage('3. Ejecución del Script') {
+        stage('3. Ejecutar Script') {
             steps {
-                // Punto 7: Pasamos el nombre y el archivo SQL como argumentos al script
-                echo "Ejecutando proceso para: ${params.USUARIO_NOMBRE}"
+                // Pasamos el nombre y el archivo SQL como argumentos
+                echo "Ejecutando script para: ${params.USUARIO_NOMBRE}"
                 sh "python script.py ${params.USUARIO_NOMBRE} setup.sql"
             }
         }
@@ -44,10 +42,10 @@ pipeline {
 
     post {
         success {
-            echo "✅ ¡Felicidades ${params.USUARIO_NOMBRE}! El reto se completó con éxito."
+            echo "✅ ¡Felicidades ${params.USUARIO_NOMBRE}! El pipeline se ejecutó correctamente."
         }
         failure {
-            echo "❌ Hubo un error. Revisa si el archivo requirements.txt existe en tu repo."
+            echo "❌ Algo salió mal. Verifica que 'requirements.txt' y 'script.py' estén en tu GitHub."
         }
     }
 }
