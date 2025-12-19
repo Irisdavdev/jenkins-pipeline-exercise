@@ -49,7 +49,7 @@ pipeline {
 
     post {
         success {
-            echo "✅ ¡Felicidades! El script se ejecutó correctamente y la base de datos fue actualizada." 🚴‍♂️
+            echo "✅ ¡Felicidades! El script se ejecutó correctamente y la base de datos fue actualizada."
         }
         failure {
             echo "❌ Algo salió mal. Revisa el 'Console Output' para más detalles."
