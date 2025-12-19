@@ -1,40 +1,47 @@
 pipeline {
     agent {
-        // Ahora que tienes el plugin, esta sintaxis funcionará perfectamente
-        docker { 
-            image 'python:3.9-slim' 
-        }
+        // Ejecutamos todo dentro de un contenedor ligero de Python
+        docker { image 'python:3.9-slim' }
+    }
+
+    // Punto 8: Jenkins revisará GitHub cada 2 minutos en busca de cambios
+    triggers {
+        pollSCM('H/2 * * * *') 
+    }
+
+    environment {
+        // Inyectamos la credencial que creamos
+        DB_PASS = credentials('postgres-db-password')
+        DB_USER = 'postgres'
+        DB_NAME = 'cicloturismo'
+        DB_HOST = '172.17.0.1' 
     }
 
     parameters {
-        string(name: 'USUARIO_NOMBRE', defaultValue: 'Estudiante', description: 'Introduce tu nombre')
-        file(name: 'setup.sql', description: 'Archivo SQL para la base de datos')
+        string(name: 'USUARIO_NOMBRE', defaultValue: 'Estudiante', description: 'Tu nombre')
+        file(name: 'setup.sql', description: 'Sube tu archivo SQL')
     }
 
     stages {
-        stage('1. Preparar Archivos') {
+        stage('1. Preparación y Validación') {
             steps {
                 script {
-                    // Localizamos el archivo SQL subido y lo movemos al directorio de trabajo
-                    // El comando 'find' ayuda a encontrarlo sin importar la carpeta temporal
-                    sh "mv \$(find . -name setup.sql) ./setup.sql"
-                    echo "✅ Archivo setup.sql listo para el script."
+                    // Punto 7: Movemos el archivo subido al workspace
+                    // Si no se sube nada, 'touch' crea uno vacío para evitar que el script falle
+                    sh "mv \$(find . -name setup.sql) ./setup.sql || touch setup.sql"
+                    echo "✅ Entorno listo para ${params.USUARIO_NOMBRE}"
                 }
             }
         }
-
-        stage('2. Instalar Dependencias') {
+        stage('2. Instalación de Librerías') {
             steps {
-                // Dentro del contenedor de Python no necesitas crear un 'venv'
-                sh 'pip install --upgrade pip'
+                // Instalamos psycopg2 y lo que necesite tu script
                 sh 'pip install -r requirements.txt'
             }
         }
-
-        stage('3. Ejecutar Script') {
+        stage('3. Ejecución del Reto') {
             steps {
-                // Pasamos el nombre y el archivo SQL como argumentos
-                echo "Ejecutando script para: ${params.USUARIO_NOMBRE}"
+                // Ejecutamos pasando nombre y archivo como argumentos (Puntos 6 y 7)
                 sh "python script.py ${params.USUARIO_NOMBRE} setup.sql"
             }
         }
@@ -42,10 +49,7 @@ pipeline {
 
     post {
         success {
-            echo "✅ ¡Felicidades ${params.USUARIO_NOMBRE}! El pipeline se ejecutó correctamente."
-        }
-        failure {
-            echo "❌ Algo salió mal. Verifica que 'requirements.txt' y 'script.py' estén en tu GitHub."
+            echo "✨ ¡Reto completado con éxito, ${params.USUARIO_NOMBRE}!"
         }
     }
 }
