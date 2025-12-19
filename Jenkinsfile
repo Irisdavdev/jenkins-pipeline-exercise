@@ -23,9 +23,9 @@ pipeline {
 
         stage('2. Crear entorno virtual') {
             steps {
-                // Usamos la variable que acabamos de encontrar
-                sh "${env.PYTHON_EXE} -m venv venv"
-                echo "Entorno virtual creado correctamente"
+                // Usamos la ruta exacta que nos dio el servidor
+                sh '/usr/bin/python3 -m venv venv'
+                echo "✅ Entorno virtual creado con la ruta: /usr/bin/python3"
             }
         }
 
