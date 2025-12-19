@@ -1,19 +1,17 @@
 pipeline {
 
     agent {
-        docker { 
-            image 'python:3.9-slim' 
+        dockerContainer {
+            image 'python:3.9-slim'
         }
     }
-
+    
     parameters {
         string(name: 'USUARIO_NOMBRE', defaultValue: 'Estudiante', description: 'Introduce tu nombre')
-        // Añadimos el parámetro de archivo para el punto 7
         file(name: 'setup.sql', description: 'Archivo SQL para la base de datos')
     }
 
     environment {
-        // Punto 1: Variable definida por el usuario
         MI_VAR_USUARIO = "Ejecución de Ejercicio"
     }
 
